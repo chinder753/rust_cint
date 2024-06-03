@@ -2,7 +2,4 @@
 
 /target
 
-/libcint
-/basis_set_exchange
-
 /src/cint/libccint.rs

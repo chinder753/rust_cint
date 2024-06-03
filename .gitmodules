@@ -1,6 +1,6 @@
-[submodule "libcint"]
-	path = libcint
-	url = https://github.com/sunqm/libcint.git
 [submodule "basis_set_exchange"]
 	path = basis_set_exchange
 	url = https://github.com/MolSSI-BSE/basis_set_exchange.git
+[submodule "libcint"]
+	path = libcint
+	url = https://github.com/sunqm/libcint.git

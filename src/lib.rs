@@ -5,17 +5,28 @@ pub(crate) mod io;
 
 #[cfg(test)]
 mod tests {
-    use std::collections::BTreeMap;
 
     #[test]
     fn test_rawdata() {
         use crate::cint::{cdata::CintDate, libccint::int1e_ovlp_cart};
+        use std::collections::BTreeMap;
 
         //
-        let basis_path =
-            "/root/temp/cint/basis_set_exchange/basis_set_exchange/data/sto/STO-3G.1.json";
-        let xyz_path = "/root/temp/cint/test.xyz";
-        let cint_data = CintDate::fron_xyz(xyz_path, basis_path);
+        let work_path = std::env::current_dir().unwrap();
+
+        let basis_path = format!(
+            "{}/basis_set_exchange/basis_set_exchange/data/sto/STO-3G.1.json",
+            work_path.to_str().unwrap()
+        );
+
+        let xyz_str = "3
+
+        H -0.5  0.0  0.0
+        O  0.0  0.0  0.0
+        H  0.5  0.0  0.0
+        ";
+
+        let cint_data = CintDate::fron_xyz(xyz_str, &basis_path);
 
         //
         let intor_all = cint_data.gen_intor_all();

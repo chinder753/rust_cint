@@ -9,19 +9,20 @@ use crate::cint::{
 
 impl AtomGroup {
     pub(crate) fn from_xyz(
-        xyz_str: Vec<&str>,
+        xyz_str: &str,
         basis: Option<BTreeMap<u8, Vec<CGTO>>>,
     ) -> Vec<Self> {
         let mut natm: NAtom = 0;
-        match xyz_str[0].parse() {
+        let xyz_list: Vec<&str> = xyz_str.trim_end().lines().collect();
+        match xyz_list[0].parse() {
             Err(why) => panic!("{:?}", why),
             Ok(v) => natm = v,
         }
-        assert_eq!(natm + 2, xyz_str.len());
 
         let mut atoms_map: BTreeMap<u8, Vec<[f64; 3]>> = BTreeMap::new();
 
-        xyz_str[2..xyz_str.len()].iter().for_each(|line| {
+        let mut counter = 0;
+        xyz_list[2..xyz_list.len()].iter().for_each(|line| {
             let mut split_s = line.trim().split_whitespace();
             let nuc = match split_s.next() {
                 Some(symbol) => match PERIODIC_TABLE.iter().position(|ele| *ele == symbol) {
@@ -46,7 +47,10 @@ impl AtomGroup {
                     ()
                 }
             }
+
+            counter += 1;
         });
+        assert_eq!(natm, counter);
 
         atoms_map
             .iter()

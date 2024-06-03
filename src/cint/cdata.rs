@@ -1,5 +1,5 @@
 use std::{
-    collections::{BTreeMap, HashMap},
+    collections::BTreeMap,
     fs,
 };
 
@@ -11,7 +11,7 @@ use super::{
         ANG_MAX, NGRIDS, PTR_COMMON_ORIG, PTR_ENV_START, PTR_EXPCUTOFF, PTR_F12_ZETA, PTR_GRIDS,
         PTR_GTG_ZETA, PTR_RANGE_OMEGA, PTR_RINV_ORIG, PTR_RINV_ZETA,
     },
-    rawdata::{AtomGroup, CGTO},
+    rawdata::AtomGroup,
     AtomIndex, BasisIndex, NAtom,
 };
 
@@ -231,13 +231,12 @@ impl CintDate {
         }
     }
 
-    pub(crate) fn fron_xyz(xyz_path: &str, basis_path: &str) -> Self {
-        let str = fs::read_to_string(basis_path).expect("Error in reading the basis file");
-        let json: JsonBasis = serde_json::from_str(&str).expect("read basis from json failed");
+    pub(crate) fn fron_xyz(xyz_str: &str, basis_path: &str) -> Self {
+        let basis_str = fs::read_to_string(basis_path).expect("Error in reading the basis file");
+        let json: JsonBasis =
+            serde_json::from_str(&basis_str).expect("read basis from json failed");
 
-        let xyz_file = fs::read_to_string(xyz_path).expect("can't open the xyz file");
-        let mut atom_group = AtomGroup::from_xyz(xyz_file.lines().collect(), None);
-
+        let mut atom_group = AtomGroup::from_xyz(xyz_str, None);
         atom_group
             .iter_mut()
             .for_each(|atoms| match json.get_elements(atoms.charge_of) {
