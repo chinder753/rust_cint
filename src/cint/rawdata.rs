@@ -41,11 +41,107 @@ impl CGTO {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct AtomGroup {
-    pub(crate) basis: Option<Vec<CGTO>>,
-    pub(crate) charge_of: u8,
-    pub(crate) nuc_mod_of: u8,
-    pub(crate) zeta: f64,
-    pub(crate) frac_charge: f64,
-    pub(crate) coordinates: Vec<[f64; 3]>,
+pub(crate) struct CintAtomGroup {
+    basis: Option<Vec<CGTO>>,
+    charge_of: u8,
+    nuc_mod_of: u8,
+    zeta: f64,
+    frac_charge: f64,
+    coordinates: Vec<[f64; 3]>,
+}
+
+impl CintAtomGroup {
+    pub(crate) fn new(
+        basis: Option<Vec<CGTO>>,
+        charge_of: u8,
+        nuc_mod_of: u8,
+        zeta: f64,
+        frac_charge: f64,
+        coordinates: Vec<[f64; 3]>,
+    ) -> Self {
+        Self {
+            basis,
+            charge_of,
+            nuc_mod_of,
+            zeta,
+            frac_charge,
+            coordinates,
+        }
+    }
+    pub(crate) fn from_other_group(atom_group: &impl AtomGroup) -> Self {
+        Self {
+            basis: atom_group.basis().clone(),
+            charge_of: *atom_group.charge_of(),
+            nuc_mod_of: *atom_group.nuc_mod_of(),
+            zeta: *atom_group.zeta(),
+            frac_charge: *atom_group.frac_charge(),
+            coordinates: atom_group.coordinates().clone(),
+        }
+    }
+}
+
+impl AtomGroup for CintAtomGroup {
+    fn basis_mut(&mut self) -> &mut Option<Vec<CGTO>> {
+        &mut self.basis
+    }
+
+    fn charge_of_mut(&mut self) -> &mut u8 {
+        &mut self.charge_of
+    }
+
+    fn nuc_mod_of_mut(&mut self) -> &mut u8 {
+        &mut self.nuc_mod_of
+    }
+
+    fn zeta_mut(&mut self) -> &mut f64 {
+        &mut self.zeta
+    }
+
+    fn frac_charge_mut(&mut self) -> &mut f64 {
+        &mut self.frac_charge
+    }
+
+    fn coordinates_mut(&mut self) -> &mut Vec<[f64; 3]> {
+        &mut self.coordinates
+    }
+
+    fn basis(&self) -> &Option<Vec<CGTO>> {
+        &self.basis
+    }
+
+    fn charge_of(&self) -> &u8 {
+        &self.charge_of
+    }
+
+    fn nuc_mod_of(&self) -> &u8 {
+        &self.nuc_mod_of
+    }
+
+    fn zeta(&self) -> &f64 {
+        &self.zeta
+    }
+
+    fn frac_charge(&self) -> &f64 {
+        &self.frac_charge
+    }
+
+    fn coordinates(&self) -> &Vec<[f64; 3]> {
+        &self.coordinates
+    }
+}
+
+pub(crate) trait AtomGroup {
+    fn basis_mut(&mut self) -> &mut Option<Vec<CGTO>>;
+    fn charge_of_mut(&mut self) -> &mut u8;
+    fn nuc_mod_of_mut(&mut self) -> &mut u8;
+    fn zeta_mut(&mut self) -> &mut f64;
+    fn frac_charge_mut(&mut self) -> &mut f64;
+    fn coordinates_mut(&mut self) -> &mut Vec<[f64; 3]>;
+
+    fn basis(&self) -> &Option<Vec<CGTO>>;
+    fn charge_of(&self) -> &u8;
+    fn nuc_mod_of(&self) -> &u8;
+    fn zeta(&self) -> &f64;
+    fn frac_charge(&self) -> &f64;
+    fn coordinates(&self) -> &Vec<[f64; 3]>;
 }

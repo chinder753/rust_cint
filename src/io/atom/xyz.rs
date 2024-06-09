@@ -3,15 +3,12 @@ use std::collections::BTreeMap;
 use super::super::convert::aatoau;
 use super::super::PERIODIC_TABLE;
 use crate::cint::{
-    rawdata::{AtomGroup, CGTO},
+    rawdata::{CintAtomGroup, CGTO},
     NAtom,
 };
 
-impl AtomGroup {
-    pub(crate) fn from_xyz(
-        xyz_str: &str,
-        basis: Option<BTreeMap<u8, Vec<CGTO>>>,
-    ) -> Vec<Self> {
+impl CintAtomGroup {
+    pub(crate) fn from_xyz(xyz_str: &str, basis: Option<BTreeMap<u8, Vec<CGTO>>>) -> Vec<Self> {
         let mut natm: NAtom = 0;
         let xyz_list: Vec<&str> = xyz_str.trim_end().lines().collect();
         match xyz_list[0].parse() {
@@ -54,19 +51,21 @@ impl AtomGroup {
 
         atoms_map
             .iter()
-            .map(|(nuc, coors)| Self {
-                basis: match &basis {
-                    Some(bas) => match bas.get(&nuc) {
-                        Some(b) => Some(b.to_vec()),
-                        None => panic!(""),
+            .map(|(nuc, coors)| {
+                Self::new(
+                    match &basis {
+                        Some(bas) => match bas.get(&nuc) {
+                            Some(b) => Some(b.to_vec()),
+                            None => panic!(""),
+                        },
+                        None => None,
                     },
-                    None => None,
-                },
-                charge_of: *nuc,
-                nuc_mod_of: 0,
-                zeta: 0.0,
-                frac_charge: 0.0,
-                coordinates: coors.to_vec(),
+                    *nuc,
+                    0,
+                    0.0,
+                    0.0,
+                    coors.to_vec(),
+                )
             })
             .collect()
     }

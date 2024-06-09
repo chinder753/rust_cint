@@ -1,7 +1,4 @@
-use std::{
-    collections::BTreeMap,
-    fs,
-};
+use std::{collections::BTreeMap, fs};
 
 use crate::io::basis::json::JsonBasis;
 
@@ -11,7 +8,7 @@ use super::{
         ANG_MAX, NGRIDS, PTR_COMMON_ORIG, PTR_ENV_START, PTR_EXPCUTOFF, PTR_F12_ZETA, PTR_GRIDS,
         PTR_GTG_ZETA, PTR_RANGE_OMEGA, PTR_RINV_ORIG, PTR_RINV_ZETA,
     },
-    rawdata::AtomGroup,
+    rawdata::{AtomGroup, CintAtomGroup},
     AtomIndex, BasisIndex, NAtom,
 };
 
@@ -116,7 +113,7 @@ impl CintEnv {
 
 #[derive(Debug, Clone)]
 pub(crate) struct CintDate {
-    atom_groups: Vec<AtomGroup>,
+    atom_groups: Vec<CintAtomGroup>,
     basis_template: Vec<Vec<CintBasis>>,
     atmbas_index: Vec<AtomIndex>,
     atm: Vec<CintAtom>,
@@ -124,20 +121,23 @@ pub(crate) struct CintDate {
 }
 
 impl CintDate {
-    pub fn new(atom_groups: Vec<AtomGroup>) -> Self {
-        atom_groups.iter().for_each(|atoms| match atoms.basis {
+    pub fn new(atom_groups: Vec<impl AtomGroup>) -> Self {
+        atom_groups.iter().for_each(|atoms| match atoms.basis() {
             Some(_) => {}
             None => panic!(),
         });
 
-        let natm: NAtom = atom_groups.iter().map(|atom| atom.coordinates.len()).sum();
+        let natm: NAtom = atom_groups
+            .iter()
+            .map(|atom| atom.coordinates().len())
+            .sum();
 
         //
         let mut ptr_exp = (PTR_ENV_START as usize) + natm * ATM_SLOT;
         let mut ptr_coeff = ptr_exp;
         let basis_template: Vec<Vec<CintBasis>> = atom_groups
             .iter()
-            .map(|atoms| match &atoms.basis {
+            .map(|atoms| match &atoms.basis() {
                 Some(basis) => basis
                     .iter()
                     .flat_map(|cgto| {
@@ -165,7 +165,7 @@ impl CintDate {
         let atmbas_index = atom_groups
             .iter()
             .enumerate()
-            .flat_map(|(i, atoms)| vec![i; atoms.coordinates.len()])
+            .flat_map(|(i, atoms)| vec![i; atoms.coordinates().len()])
             .collect();
 
         //
@@ -174,18 +174,18 @@ impl CintDate {
             .iter()
             .flat_map(|atoms| {
                 atoms
-                    .coordinates
+                    .coordinates()
                     .iter()
                     .map(|coor| {
                         let coord_i = (PTR_ENV_START as usize) + iatm * ATM_SLOT;
                         let zeta_i = coord_i + 3;
                         iatm += 1;
                         CintAtom {
-                            charge_of: atoms.charge_of.into(),
+                            charge_of: (*atoms.charge_of()).into(),
                             coord: coord_i as i32,
-                            nuc_mod_of: atoms.nuc_mod_of.into(),
+                            nuc_mod_of: (*atoms.nuc_mod_of()).into(),
                             zeta: zeta_i as i32,
-                            frac_charge: atoms.frac_charge as i32,
+                            frac_charge: (*atoms.frac_charge()) as i32,
                             reserve_atmslot: 0,
                         }
                     })
@@ -198,15 +198,15 @@ impl CintDate {
             .iter()
             .flat_map(|atoms| {
                 atoms
-                    .coordinates
+                    .coordinates()
                     .iter()
-                    .flat_map(|coor| vec![coor[0], coor[1], coor[2], atoms.zeta])
+                    .flat_map(|coor| vec![coor[0], coor[1], coor[2], *atoms.zeta()])
             })
             .collect();
 
         let env_bas = atom_groups
             .iter()
-            .flat_map(|atoms| match &atoms.basis {
+            .flat_map(|atoms| match &atoms.basis() {
                 Some(basis) => basis.iter().flat_map(|cgto| {
                     cgto.exp
                         .iter()
@@ -223,7 +223,7 @@ impl CintDate {
 
         //
         Self {
-            atom_groups,
+            atom_groups: atom_groups.iter().map(|atom| CintAtomGroup::from_other_group(atom)).collect(),
             basis_template,
             atmbas_index,
             atm,
@@ -236,11 +236,11 @@ impl CintDate {
         let json: JsonBasis =
             serde_json::from_str(&basis_str).expect("read basis from json failed");
 
-        let mut atom_group = AtomGroup::from_xyz(xyz_str, None);
+        let mut atom_group = CintAtomGroup::from_xyz(xyz_str, None);
         atom_group
             .iter_mut()
-            .for_each(|atoms| match json.get_elements(atoms.charge_of) {
-                Some(ele) => atoms.basis = Some(ele.to_cgto(0, true)),
+            .for_each(|atoms| match json.get_elements(*atoms.charge_of()) {
+                Some(ele) => (*atoms.basis_mut()) = Some(ele.to_cgto(0, true)),
                 None => panic!(""),
             });
 
