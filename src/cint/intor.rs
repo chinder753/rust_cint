@@ -7,17 +7,17 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
-pub(crate) struct IntorResult<const N: NAtom> {
+pub struct IntorResult<const N: NAtom> {
     dims: Vec<i32>,
     out: Vec<f64>,
 }
 
 impl<const N: NAtom> IntorResult<N> {
-    pub(crate) fn dims(&self) -> &Vec<i32> {
+    pub fn dims(&self) -> &Vec<i32> {
         &self.dims
     }
 
-    pub(crate) fn out(&self) -> &Vec<f64> {
+    pub fn out(&self) -> &Vec<f64> {
         &self.out
     }
 }
@@ -38,7 +38,7 @@ impl<const N: NAtom> Index<Vec<usize>> for IntorResult<N> {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct Intor<'a> {
+pub struct Intor<'a> {
     dims_cart: Vec<i32>,
     dims_spheric: Vec<i32>,
     dims_spinor: Vec<i32>,
@@ -50,7 +50,7 @@ pub(crate) struct Intor<'a> {
 }
 
 impl<'a> Intor<'a> {
-    pub(crate) fn new(atm: &'a Vec<CintAtom>, bas: Vec<CintBasis>, env: &'a CintEnv) -> Self {
+    pub fn new(atm: &'a Vec<CintAtom>, bas: Vec<CintBasis>, env: &'a CintEnv) -> Self {
         let dims_cart = bas
             .iter()
             .enumerate()
@@ -78,15 +78,15 @@ impl<'a> Intor<'a> {
         }
     }
 
-    pub(crate) fn natm(&self) -> i32 {
+    pub fn natm(&self) -> i32 {
         self.natm
     }
 
-    pub(crate) fn nbas(&self) -> i32 {
+    pub fn nbas(&self) -> i32 {
         self.nbas
     }
 
-    pub(crate) unsafe fn int_cart<const N: NAtom>(
+    pub unsafe fn int_cart<const N: NAtom>(
         &self,
         shls: [i32; N],
         int_func: CINTIntegralFunction,

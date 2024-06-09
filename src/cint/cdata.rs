@@ -14,7 +14,7 @@ use super::{
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct CintAtom {
+pub struct CintAtom {
     charge_of: i32,
     coord: i32,
     nuc_mod_of: i32,
@@ -24,7 +24,7 @@ pub(crate) struct CintAtom {
 }
 
 impl CintAtom {
-    pub(crate) fn empty() -> Self {
+    pub fn empty() -> Self {
         CintAtom {
             charge_of: 0,
             coord: 0,
@@ -38,7 +38,7 @@ impl CintAtom {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct CintBasis {
+pub struct CintBasis {
     pub(super) atom_of: i32,
     pub(super) ang_of: i32,
     pub(super) nprim_of: i32,
@@ -50,7 +50,7 @@ pub(crate) struct CintBasis {
 }
 
 impl CintBasis {
-    pub(crate) fn empty() -> Self {
+    pub fn empty() -> Self {
         Self {
             atom_of: 0,
             ang_of: 0,
@@ -69,55 +69,55 @@ const ATM_SLOT: usize = 4;
 
 #[repr(C)]
 #[derive(Debug, Clone)]
-pub(crate) struct CintEnv {
+pub struct CintEnv {
     pub(self) data: Vec<f64>,
 }
 
 impl CintEnv {
-    pub(crate) fn expcutoff(&mut self) -> &mut f64 {
+    pub fn expcutoff(&mut self) -> &mut f64 {
         &mut self.data[PTR_EXPCUTOFF as usize]
     }
-    pub(crate) fn common_orig(&mut self) -> &mut [f64] {
+    pub fn common_orig(&mut self) -> &mut [f64] {
         &mut self.data[(PTR_COMMON_ORIG as usize)..(PTR_RINV_ORIG as usize)]
     }
-    pub(crate) fn rinv_orig(&mut self) -> &mut [f64] {
+    pub fn rinv_orig(&mut self) -> &mut [f64] {
         &mut self.data[(PTR_RINV_ORIG as usize)..(PTR_RINV_ZETA as usize)]
     }
-    pub(crate) fn rinv_zeta(&mut self) -> &mut f64 {
+    pub fn rinv_zeta(&mut self) -> &mut f64 {
         &mut self.data[PTR_RANGE_OMEGA as usize]
     }
-    pub(crate) fn range_omega(&mut self) -> &mut f64 {
+    pub fn range_omega(&mut self) -> &mut f64 {
         &mut self.data[PTR_RANGE_OMEGA as usize]
     }
-    pub(crate) fn f12_zeta(&mut self) -> &mut f64 {
+    pub fn f12_zeta(&mut self) -> &mut f64 {
         &mut self.data[PTR_F12_ZETA as usize]
     }
-    pub(crate) fn gtg_zeta(&mut self) -> &mut f64 {
+    pub fn gtg_zeta(&mut self) -> &mut f64 {
         &mut self.data[PTR_GTG_ZETA as usize]
     }
-    pub(crate) fn ngrids(&mut self) -> &mut f64 {
+    pub fn ngrids(&mut self) -> &mut f64 {
         &mut self.data[NGRIDS as usize]
     }
-    pub(crate) fn grids(&mut self) -> &mut [f64] {
+    pub fn grids(&mut self) -> &mut [f64] {
         &mut self.data[(PTR_GRIDS as usize)..(PTR_ENV_START as usize)]
     }
-    pub(crate) fn atom(&mut self, iatm: usize) -> &mut [f64] {
+    pub fn atom(&mut self, iatm: usize) -> &mut [f64] {
         let start = ATM_OFFSET + ATM_SLOT * iatm;
         let end = ATM_OFFSET + ATM_SLOT * (iatm + 1);
         &mut self.data[start..end]
     }
-    pub(crate) fn as_ptr(&self) -> *const f64 {
+    pub fn as_ptr(&self) -> *const f64 {
         self.data.as_ptr()
     }
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct CintDate {
+pub struct CintDate {
     atom_groups: Vec<CintAtomGroup>,
     basis_template: Vec<Vec<CintBasis>>,
     atmbas_index: Vec<AtomIndex>,
     atm: Vec<CintAtom>,
-    pub(crate) env: CintEnv,
+    pub env: CintEnv,
 }
 
 impl CintDate {
@@ -231,7 +231,7 @@ impl CintDate {
         }
     }
 
-    pub(crate) fn fron_xyz(xyz_str: &str, basis_path: &str) -> Self {
+    pub fn fron_xyz(xyz_str: &str, basis_path: &str) -> Self {
         let basis_str = fs::read_to_string(basis_path).expect("Error in reading the basis file");
         let json: JsonBasis =
             serde_json::from_str(&basis_str).expect("read basis from json failed");
@@ -301,18 +301,18 @@ impl CintDate {
             .collect()
     }
 
-    pub(crate) fn gen_intor_select<'a>(
+    pub fn gen_intor_select<'a>(
         &'a self,
         which_bas: BTreeMap<AtomIndex, Vec<BasisIndex>>,
     ) -> Intor {
         Intor::new(&self.atm, self.gen_bas_all(), &self.env)
     }
 
-    pub(crate) fn gen_intor<'a>(&'a self, iatm: Vec<AtomIndex>) -> Intor {
+    pub fn gen_intor<'a>(&'a self, iatm: Vec<AtomIndex>) -> Intor {
         Intor::new(&self.atm, self.gen_bas_all(), &self.env)
     }
 
-    pub(crate) fn gen_intor_all<'a>(&'a self) -> Intor {
+    pub fn gen_intor_all<'a>(&'a self) -> Intor {
         Intor::new(&self.atm, self.gen_bas_all(), &self.env)
     }
 }

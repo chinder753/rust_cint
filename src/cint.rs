@@ -1,13 +1,13 @@
-pub(crate) mod cdata;
-pub(crate) mod intor;
-pub(crate) mod libccint;
-pub(crate) mod rawdata;
+pub mod cdata;
+pub mod intor;
+pub mod libccint;
+pub mod rawdata;
 
-pub(crate) const NUC_POINT: i32 = 1;
-pub(crate) const NUC_GAUSS: i32 = 2;
+pub const NUC_POINT: i32 = 1;
+pub const NUC_GAUSS: i32 = 2;
 
-pub(crate) type AtomIndex = usize;
-pub(crate) type NAtom = usize;
+pub type AtomIndex = usize;
+pub type NAtom = usize;
 
-pub(crate) type BasisIndex = usize;
-pub(crate) type NBasis = usize;
+pub type BasisIndex = usize;
+pub type NBasis = usize;

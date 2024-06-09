@@ -1,7 +1,7 @@
 #[allow(unused)]
-pub(crate) mod cint;
+pub mod cint;
 #[allow(unused)]
-pub(crate) mod io;
+pub mod io;
 
 #[cfg(test)]
 mod tests {

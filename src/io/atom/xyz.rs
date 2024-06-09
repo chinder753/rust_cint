@@ -8,7 +8,7 @@ use crate::cint::{
 };
 
 impl CintAtomGroup {
-    pub(crate) fn from_xyz(xyz_str: &str, basis: Option<BTreeMap<u8, Vec<CGTO>>>) -> Vec<Self> {
+    pub fn from_xyz(xyz_str: &str, basis: Option<BTreeMap<u8, Vec<CGTO>>>) -> Vec<Self> {
         let mut natm: NAtom = 0;
         let xyz_list: Vec<&str> = xyz_str.trim_end().lines().collect();
         match xyz_list[0].parse() {

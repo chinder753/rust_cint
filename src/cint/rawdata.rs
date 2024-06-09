@@ -1,15 +1,15 @@
 use super::{cdata::CintBasis, libccint::CINTgto_norm};
 
 #[derive(Debug, Clone)]
-pub(crate) struct CGTO {
-    pub(crate) kappa_of: i8,
-    pub(crate) angl: Vec<u8>,
-    pub(crate) exp: Vec<f64>,
-    pub(crate) coeff: Vec<Vec<f64>>,
+pub struct CGTO {
+    pub kappa_of: i8,
+    pub angl: Vec<u8>,
+    pub exp: Vec<f64>,
+    pub coeff: Vec<Vec<f64>>,
 }
 
 impl CGTO {
-    pub(crate) fn norm(mut self) -> Self {
+    pub fn norm(mut self) -> Self {
         // pub fn CINTgto_norm(n: ::std::os::raw::c_int, a: f64) -> f64;
         self.coeff = self
             .coeff
@@ -26,7 +26,7 @@ impl CGTO {
         self
     }
 
-    pub(crate) fn gen_bas(&self, iangl: usize, ptr_exp: i32, ptr_coeff: i32) -> CintBasis {
+    pub fn gen_bas(&self, iangl: usize, ptr_exp: i32, ptr_coeff: i32) -> CintBasis {
         CintBasis {
             atom_of: -1,
             ang_of: self.angl[iangl].into(),
@@ -41,7 +41,7 @@ impl CGTO {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct CintAtomGroup {
+pub struct CintAtomGroup {
     basis: Option<Vec<CGTO>>,
     charge_of: u8,
     nuc_mod_of: u8,
@@ -51,7 +51,7 @@ pub(crate) struct CintAtomGroup {
 }
 
 impl CintAtomGroup {
-    pub(crate) fn new(
+    pub fn new(
         basis: Option<Vec<CGTO>>,
         charge_of: u8,
         nuc_mod_of: u8,
@@ -68,7 +68,7 @@ impl CintAtomGroup {
             coordinates,
         }
     }
-    pub(crate) fn from_other_group(atom_group: &impl AtomGroup) -> Self {
+    pub fn from_other_group(atom_group: &impl AtomGroup) -> Self {
         Self {
             basis: atom_group.basis().clone(),
             charge_of: *atom_group.charge_of(),
@@ -130,7 +130,7 @@ impl AtomGroup for CintAtomGroup {
     }
 }
 
-pub(crate) trait AtomGroup {
+pub trait AtomGroup {
     fn basis_mut(&mut self) -> &mut Option<Vec<CGTO>>;
     fn charge_of_mut(&mut self) -> &mut u8;
     fn nuc_mod_of_mut(&mut self) -> &mut u8;
